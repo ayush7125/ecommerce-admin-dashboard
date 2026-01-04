@@ -80,7 +80,7 @@ export async function DELETE(
 
     // Delete images from Cloudinary
     if (product.images && product.images.length > 0) {
-      await Promise.all(product.images.map((img) => deleteImage(img)));
+      await Promise.all(product.images.map((img: string) => deleteImage(img)));
     }
 
     await Product.findByIdAndDelete(params.id);

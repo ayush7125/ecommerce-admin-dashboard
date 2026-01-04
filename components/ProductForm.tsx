@@ -151,9 +151,10 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       
       console.log('🚀 Submitting product data:', formData);
       mutation.mutate(formData);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Error in onSubmit:', error);
-      alert('Failed to submit form. Please check the console for details.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit form. Please check the console for details.';
+      alert(errorMessage);
     }
   };
 
