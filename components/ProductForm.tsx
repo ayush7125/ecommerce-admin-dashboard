@@ -129,8 +129,9 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       setImages(newImages);
       setValue('images', newImages);
       toast.showToast('Image uploaded successfully', 'success');
-    } catch (error) {
-      toast.showToast('Failed to upload image. Please try again.', 'error');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image. Please try again.';
+      toast.showToast(errorMessage, 'error');
     } finally {
       setUploading(false);
     }
