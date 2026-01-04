@@ -1,14 +1,27 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Lazy configuration - only configure when actually used
+function configureCloudinary() {
+  const cloud_name = process.env.CLOUDINARY_CLOUD_NAME;
+  const api_key = process.env.CLOUDINARY_API_KEY;
+  const api_secret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!cloud_name || !api_key || !api_secret) {
+    throw new Error('Please define CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables');
+  }
+
+  cloudinary.config({
+    cloud_name,
+    api_key,
+    api_secret,
+  });
+}
 
 export default cloudinary;
 
 export const uploadImage = async (buffer: Buffer): Promise<string> => {
+  configureCloudinary();
+  
   return new Promise((resolve, reject) => {
     cloudinary.uploader
       .upload_stream(
@@ -31,6 +44,7 @@ export const uploadImage = async (buffer: Buffer): Promise<string> => {
 };
 
 export const deleteImage = async (imageUrl: string): Promise<void> => {
+  configureCloudinary();
   const publicId = imageUrl.split('/').slice(-2).join('/').split('.')[0];
   await cloudinary.uploader.destroy(`ecommerce-products/${publicId}`);
 };
