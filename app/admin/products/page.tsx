@@ -40,6 +40,9 @@ async function getProducts(page: number = 1, search: string = '', category: stri
     const formattedProducts = products.map((product: any) => ({
       ...product,
       _id: String(product._id),
+      price: Number(product.price || 0),
+      stock: Number(product.stock || 0),
+      sales: Number(product.sales || 0),
     }));
 
     return {

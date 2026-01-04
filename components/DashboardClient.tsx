@@ -188,7 +188,7 @@ export default function DashboardClient({ stats: initialStats }: DashboardClient
                   animationBegin={0}
                   animationDuration={800}
                 >
-                  {categoryData.map((entry, index) => (
+                  {categoryData.map((entry: { name: string; value: number; sales: number }, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>

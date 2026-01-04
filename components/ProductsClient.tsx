@@ -192,7 +192,7 @@ export default function ProductsClient({ initialData }: ProductsClientProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product, index) => (
+          {products.map((product: Product, index: number) => (
             <div
               key={product._id}
               className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100/50 overflow-hidden transform hover:-translate-y-2 hover-lift animate-slideUp"
