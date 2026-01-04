@@ -36,13 +36,19 @@ async function getProducts(page: number = 1, search: string = '', category: stri
       Product.countDocuments(query),
     ]);
 
+    // Convert ObjectIds to strings for all products
+    const formattedProducts = products.map((product: any) => ({
+      ...product,
+      _id: String(product._id),
+    }));
+
     return {
-      products,
+      products: formattedProducts,
       pagination: {
         page,
         limit,
-        total,
-        pages: Math.ceil(total / limit),
+        total: Number(total),
+        pages: Math.ceil(Number(total) / limit),
       },
     };
   } catch (error) {
