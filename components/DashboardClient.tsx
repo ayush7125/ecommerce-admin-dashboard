@@ -33,12 +33,12 @@ const COLORS = [
 ];
 
 // Custom tooltip component
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-semibold text-gray-900">{label}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry: { name: string; value: number; color: string }, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: <span className="font-medium">{entry.value}</span>
           </p>
@@ -68,8 +68,8 @@ export default function DashboardClient({ stats: initialStats }: DashboardClient
   }));
 
   const topProductsData = stats.topProducts
-    .filter((product: any) => product.sales > 0) // Only show products with sales
-    .map((product: any) => ({
+    .filter((product: { _id: string; name: string; sales: number }) => product.sales > 0) // Only show products with sales
+    .map((product: { _id: string; name: string; sales: number }) => ({
       name: product.name.length > 12 ? product.name.substring(0, 12) + '...' : product.name,
       sales: product.sales || 0,
     }));
