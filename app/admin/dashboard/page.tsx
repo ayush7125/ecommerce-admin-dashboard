@@ -40,16 +40,29 @@ async function getStats() {
         },
         { $sort: { totalSales: -1 } },
       ]),
-      Product.find().sort({ sales: -1 }).limit(5).select('name sales').lean(),
+      Product.find().sort({ sales: -1 }).limit(5).select('name sales _id').lean(),
     ]);
 
+    // Convert ObjectIds to strings and ensure proper types
+    const formattedCategoryStats = categoryStats.map((cat: any) => ({
+      _id: String(cat._id || 'Uncategorized'),
+      count: Number(cat.count || 0),
+      totalSales: Number(cat.totalSales || 0),
+    }));
+
+    const formattedTopProducts = topProducts.map((product: any) => ({
+      _id: String(product._id),
+      name: String(product.name || ''),
+      sales: Number(product.sales || 0),
+    }));
+
     return {
-      totalProducts,
-      totalStock: totalStock[0]?.total || 0,
-      totalSales: totalSales[0]?.total || 0,
-      lowStockProducts,
-      categoryStats,
-      topProducts,
+      totalProducts: Number(totalProducts || 0),
+      totalStock: Number(totalStock[0]?.total || 0),
+      totalSales: Number(totalSales[0]?.total || 0),
+      lowStockProducts: Number(lowStockProducts || 0),
+      categoryStats: formattedCategoryStats,
+      topProducts: formattedTopProducts,
     };
   } catch (error) {
     console.error('Error fetching stats:', error);
