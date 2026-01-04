@@ -61,7 +61,7 @@ export default function DashboardClient({ stats: initialStats }: DashboardClient
     refetchInterval: 30000,
   });
 
-  const categoryData = stats.categoryStats.map((cat) => ({
+  const categoryData = stats.categoryStats.map((cat: { _id: string; count: number; totalSales: number }) => ({
     name: cat._id || 'Uncategorized',
     value: cat.count,
     sales: cat.totalSales || 0,
@@ -74,7 +74,7 @@ export default function DashboardClient({ stats: initialStats }: DashboardClient
       sales: product.sales || 0,
     }));
 
-  const categorySalesData = categoryData.filter((cat) => cat.sales > 0);
+  const categorySalesData = categoryData.filter((cat: { name: string; value: number; sales: number }) => cat.sales > 0);
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8">
