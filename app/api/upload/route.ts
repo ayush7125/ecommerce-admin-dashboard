@@ -30,11 +30,19 @@ export async function POST(request: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const imageUrl = await uploadImage(buffer);
-
-    return NextResponse.json({ url: imageUrl });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    try {
+      const imageUrl = await uploadImage(buffer);
+      return NextResponse.json({ url: imageUrl });
+    } catch (uploadError: unknown) {
+      console.error('Cloudinary upload error:', uploadError);
+      const errorMessage = uploadError instanceof Error ? uploadError.message : 'Failed to upload image';
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+  } catch (error: unknown) {
+    console.error('Upload API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 

@@ -20,32 +20,56 @@ function configureCloudinary() {
 export default cloudinary;
 
 export const uploadImage = async (buffer: Buffer): Promise<string> => {
-  configureCloudinary();
+  try {
+    configureCloudinary();
+  } catch (configError) {
+    console.error('Cloudinary configuration error:', configError);
+    throw new Error('Cloudinary is not properly configured. Please check your environment variables.');
+  }
   
   return new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
+    try {
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
           folder: 'ecommerce-products',
         },
         (error, result) => {
           if (error) {
-            reject(error);
-          } else if (result) {
+            console.error('Cloudinary upload stream error:', error);
+            reject(new Error(error.message || 'Failed to upload image to Cloudinary'));
+          } else if (result && result.secure_url) {
             resolve(result.secure_url);
           } else {
-            reject(new Error('Upload failed'));
+            console.error('Cloudinary upload returned no result');
+            reject(new Error('Upload failed: No result from Cloudinary'));
           }
         }
-      )
-      .end(buffer);
+      );
+      
+      uploadStream.on('error', (streamError) => {
+        console.error('Upload stream error event:', streamError);
+        reject(new Error(streamError.message || 'Stream error during upload'));
+      });
+      
+      uploadStream.end(buffer);
+    } catch (streamError) {
+      console.error('Error creating upload stream:', streamError);
+      reject(new Error('Failed to create upload stream'));
+    }
   });
 };
 
 export const deleteImage = async (imageUrl: string): Promise<void> => {
-  configureCloudinary();
-  const publicId = imageUrl.split('/').slice(-2).join('/').split('.')[0];
-  await cloudinary.uploader.destroy(`ecommerce-products/${publicId}`);
+  try {
+    configureCloudinary();
+    const publicId = imageUrl.split('/').slice(-2).join('/').split('.')[0];
+    await cloudinary.uploader.destroy(`ecommerce-products/${publicId}`);
+  } catch (error) {
+    console.error('Error deleting image from Cloudinary:', error);
+    // Don't throw - image deletion failure shouldn't break the flow
+    // Log the error but continue
+  }
 };
+
 
