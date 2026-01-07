@@ -37,7 +37,19 @@ export async function POST(request: NextRequest) {
     } catch (uploadError: unknown) {
       console.error('Cloudinary upload error:', uploadError);
       const errorMessage = uploadError instanceof Error ? uploadError.message : 'Failed to upload image';
-      return NextResponse.json({ error: errorMessage }, { status: 500 });
+      
+      // Provide more helpful error messages
+      let statusCode = 500;
+      if (errorMessage.includes('authentication failed') || errorMessage.includes('API key')) {
+        statusCode = 401;
+      } else if (errorMessage.includes('Bad request') || errorMessage.includes('Invalid request')) {
+        statusCode = 400;
+      }
+      
+      return NextResponse.json({ 
+        error: errorMessage,
+        hint: errorMessage.includes('Cloudinary') ? 'Please verify your Cloudinary credentials in Vercel environment variables' : undefined
+      }, { status: statusCode });
     }
   } catch (error: unknown) {
     console.error('Upload API error:', error);

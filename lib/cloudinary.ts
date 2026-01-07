@@ -10,11 +10,21 @@ function configureCloudinary() {
     throw new Error('Please define CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables');
   }
 
-  cloudinary.config({
-    cloud_name,
-    api_key,
-    api_secret,
-  });
+  // Validate that values are not empty strings
+  if (cloud_name.trim() === '' || api_key.trim() === '' || api_secret.trim() === '') {
+    throw new Error('Cloudinary environment variables cannot be empty');
+  }
+
+  try {
+    cloudinary.config({
+      cloud_name: cloud_name.trim(),
+      api_key: api_key.trim(),
+      api_secret: api_secret.trim(),
+    });
+  } catch (configError) {
+    console.error('Cloudinary config error:', configError);
+    throw new Error('Failed to configure Cloudinary. Please check your credentials.');
+  }
 }
 
 export default cloudinary;
@@ -24,7 +34,8 @@ export const uploadImage = async (buffer: Buffer): Promise<string> => {
     configureCloudinary();
   } catch (configError) {
     console.error('Cloudinary configuration error:', configError);
-    throw new Error('Cloudinary is not properly configured. Please check your environment variables.');
+    const errorMessage = configError instanceof Error ? configError.message : 'Cloudinary is not properly configured';
+    throw new Error(errorMessage);
   }
   
   return new Promise((resolve, reject) => {
@@ -33,29 +44,47 @@ export const uploadImage = async (buffer: Buffer): Promise<string> => {
         {
           resource_type: 'image',
           folder: 'ecommerce-products',
+          timeout: 60000, // 60 second timeout
         },
         (error, result) => {
           if (error) {
             console.error('Cloudinary upload stream error:', error);
-            reject(new Error(error.message || 'Failed to upload image to Cloudinary'));
+            
+            // Handle specific Cloudinary error codes
+            if (error.http_code === 401) {
+              reject(new Error('Cloudinary authentication failed. Please check your API key and secret.'));
+            } else if (error.http_code === 400) {
+              reject(new Error(`Invalid request to Cloudinary: ${error.message || 'Bad request'}`));
+            } else if (error.http_code === 500) {
+              reject(new Error('Cloudinary server error. This may be due to invalid credentials or account issues. Please verify your Cloudinary account and credentials.'));
+            } else if (error.message && error.message.includes('invalid JSON')) {
+              reject(new Error('Cloudinary returned an invalid response. Please verify your Cloudinary credentials and account status.'));
+            } else {
+              reject(new Error(error.message || `Failed to upload image to Cloudinary (HTTP ${error.http_code || 'unknown'})`));
+            }
           } else if (result && result.secure_url) {
             resolve(result.secure_url);
           } else {
-            console.error('Cloudinary upload returned no result');
+            console.error('Cloudinary upload returned no result:', result);
             reject(new Error('Upload failed: No result from Cloudinary'));
           }
         }
       );
       
-      uploadStream.on('error', (streamError) => {
+      uploadStream.on('error', (streamError: Error) => {
         console.error('Upload stream error event:', streamError);
         reject(new Error(streamError.message || 'Stream error during upload'));
+      });
+      
+      uploadStream.on('end', () => {
+        // Stream ended - callback will handle result
       });
       
       uploadStream.end(buffer);
     } catch (streamError) {
       console.error('Error creating upload stream:', streamError);
-      reject(new Error('Failed to create upload stream'));
+      const errorMessage = streamError instanceof Error ? streamError.message : 'Failed to create upload stream';
+      reject(new Error(errorMessage));
     }
   });
 };
