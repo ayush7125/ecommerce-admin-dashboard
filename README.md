@@ -639,8 +639,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+- GitHub: ayush7125
+- Email: ayush_km@ch.iitr.ac.in
 
 ---
 
@@ -664,6 +664,5 @@ If you find this project helpful, please give it a star on GitHub!
 
 **Built with ❤️ using Next.js, TypeScript, and MongoDB**
 
-[Report Bug](https://github.com/yourusername/repo/issues) • [Request Feature](https://github.com/yourusername/repo/issues) • [Documentation](./SETUP.md)
 
 </div>
