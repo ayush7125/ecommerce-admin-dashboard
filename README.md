@@ -13,6 +13,8 @@
 
 </div>
 
+Navigate to [https://ecommerce-admin-dashboard-7udf.vercel.app](https://ecommerce-admin-dashboard-7udf.vercel.app)
+
 ---
 
 ## 📋 Table of Contents
@@ -594,16 +596,6 @@ Contributions are welcome! Please follow these steps:
 - Use ESLint for code quality
 - Write meaningful commit messages
 - Add comments for complex logic
-
----
-
-## 📚 Additional Documentation
-
-- **[SETUP.md](./SETUP.md)** - Detailed setup instructions
-- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Testing procedures
-- **[FEATURE_CHECKLIST.md](./FEATURE_CHECKLIST.md)** - Feature verification
-- **[PROJECT_HIGHLIGHTS.md](./PROJECT_HIGHLIGHTS.md)** - Project showcase
-- **[UI_IMPROVEMENTS.md](./UI_IMPROVEMENTS.md)** - UI enhancements
 
 ---
 
